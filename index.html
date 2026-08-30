@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>WhatsApp Coexistence Setup</title>
+
+  <script async defer crossorigin="anonymous"
+    src="https://connect.facebook.net/en_US/sdk.js">
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      max-width: 700px;
+      margin: auto;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    button {
+      background: #25D366;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    #status {
+      margin-top: 25px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      text-align: left;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Ng Kwan Yew Agency Client Care</h2>
+
+  <p>
+    Connect your existing WhatsApp Business App
+    to WhatsApp Business Platform.
+  </p>
+
+  <button onclick="launchWhatsAppSignup()">
+    Connect WhatsApp Business
+  </button>
+
+  <div id="status">
+    Ready to connect.
+  </div>
+
+  <script>
+    const META_APP_ID = '1633793068403073';
+    const CONFIG_ID = '1601391884975884';
+
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: META_APP_ID,
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: 'v25.0'
+      });
+
+      document.getElementById('status').innerText =
+        'Meta SDK loaded. Ready to connect.';
+    };
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'https://www.facebook.com') {
+        return;
+      }
+
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'WA_EMBEDDED_SIGNUP') {
+          console.log('WhatsApp Embedded Signup:', data);
+
+          document.getElementById('status').innerText =
+            'WhatsApp setup event received.\n\n' +
+            JSON.stringify(data, null, 2);
+        }
+
+      } catch (error) {
+        console.log('Meta message event:', event.data);
+      }
+    });
+
+    function launchWhatsAppSignup() {
+      document.getElementById('status').innerText =
+        'Opening Meta WhatsApp setup...';
+
+      FB.login(
+        function(response) {
+          console.log('Facebook login response:', response);
+
+          if (response.authResponse) {
+            document.getElementById('status').innerText =
+              'Meta authorization successful.\n' +
+              'Continue with the WhatsApp setup window.';
+          } else {
+            document.getElementById('status').innerText =
+              'Setup was cancelled or authorization was not completed.';
+          }
+        },
+        {
+          config_id: CONFIG_ID,
+          response_type: 'code',
+          override_default_response_type: true
+        }
+      );
+    }
+  </script>
+
+</body>
+</html>
